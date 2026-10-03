@@ -8,6 +8,10 @@ const eggStage = ref('whole') // 'whole' | 'cracked' | 'fried'
 const shaking = ref(false)
 const popping = ref(false)
 
+// --- Timing constants ---
+const COUNTDOWN_MS = 8000
+const WINNER_HOLD_MS = 3000
+
 // --- Toggle helpers ---
 const timeoutIds = []
 function clearAllTimeouts() {
@@ -79,15 +83,17 @@ function startCountdown() {
     })
     isGameOver.value = true
     clearInterval(flickerInterval)
+    flickerInterval = null
     resultTimeout = setTimeout(() => {
       emit('win', winner.value)
-    }, 3000)
-  }, 10000)
+    }, WINNER_HOLD_MS)
+  }, COUNTDOWN_MS)
 }
 
 function clearCountdown() {
   if (countdownTimeout) { clearTimeout(countdownTimeout); countdownTimeout = null }
   if (flickerInterval) { clearInterval(flickerInterval); flickerInterval = null }
+  if (resultTimeout) { clearTimeout(resultTimeout); resultTimeout = null }
 }
 
 watch(playerCount, (newCount) => {
@@ -104,8 +110,7 @@ onUnmounted(() => {
   clearCountdown()
 })
 
-// --- Pointer handlers (real touch/multi-finger) ---
-// playArea ref so we can get getBoundingClientRect
+// --- Pointer handlers (real touch / multi-finger) ---
 const playArea = ref(null)
 
 function getRelative(e) {
@@ -155,7 +160,7 @@ function onTapClick(e) {
   const hitIdx = tapIndicators.value.findIndex(ind => {
     const dx = ind.x - x
     const dy = ind.y - y
-    return Math.hypot(dx, dy) <= 28
+    return Math.hypot(dx, dy) <= 52
   })
   if (hitIdx !== -1) {
     tapIndicators.value.splice(hitIdx, 1)
@@ -169,7 +174,6 @@ function onTapClick(e) {
 </script>
 
 <template>
-  <!-- Screen root: relative so absolute children position inside it -->
   <div class="absolute inset-0 bg-[#111111]">
 
     <!-- Preload egg images -->
@@ -250,13 +254,13 @@ function onTapClick(e) {
           transform: 'translate(-50%, -50%)',
         }"
       >
-        <!-- Outer ring -->
-        <div class="w-[56px] h-[56px] rounded-full border-[1.5px] flex items-center justify-center"
-             :style="{ borderColor: ind.color }">
-          <!-- Inner filled circle -->
-          <div class="w-[44px] h-[44px] rounded-full flex items-center justify-center"
-               :style="{ backgroundColor: ind.color, transform: ind.isWinner ? 'scale(1.15)' : 'scale(1)', transition: 'transform 300ms' }">
-            <span class="font-poppins text-white text-[14px] font-semibold">{{ ind.order }}</span>
+        <!-- Outer ring: 104px, 2px border -->
+        <div class="w-[104px] h-[104px] rounded-full flex items-center justify-center"
+             :style="{ border: `2px solid ${ind.color}` }">
+          <!-- Inner filled circle: 80px -->
+          <div class="w-[80px] h-[80px] rounded-full flex items-center justify-center"
+               :style="{ backgroundColor: ind.color, transform: ind.isWinner ? 'scale(1.1)' : 'scale(1)', transition: 'transform 300ms' }">
+            <span class="font-poppins text-white font-semibold" style="font-size: 18px;">{{ ind.order }}</span>
           </div>
         </div>
       </div>
