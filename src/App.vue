@@ -79,7 +79,7 @@ const games = [
         <!-- GAMES SCREEN -->
         <div v-else-if="currentScreen === 'games'" class="absolute inset-0 bg-[#111111] flex flex-col">
           <!-- Top Section -->
-          <div class="px-[24px]">
+          <div class="px-[24px] pt-[86px]">
             <BackButton @click="currentScreen = 'splash'" />
             
             <h2 class="font-poppins text-[20px] font-semibold text-white tracking-[-0.5px] mt-[24px]">Choose your chaos</h2>
