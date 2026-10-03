@@ -2,9 +2,21 @@
 import { ref } from 'vue'
 import StatusBar from './components/StatusBar.vue'
 import FingerScreen from './components/FingerScreen.vue'
+import BackButton from './components/BackButton.vue'
+import ResultScreen from './components/ResultScreen.vue'
 
 const currentScreen = ref('splash')
+const winner = ref(null)
 
+function handleWin(p) {
+  winner.value = p
+  currentScreen.value = 'result'
+}
+
+function resetToFinger() {
+  currentScreen.value = 'finger'
+  winner.value = null
+}
 const games = [
   { title: 'Pick a Finger', badge: 'Multi player', description: 'Everyone holds a finger on the screen. One gets chosen.', image: '/assets/game_finger.png' },
   { title: 'Spin the wheel', badge: 'Multi player', description: 'Add names, give it a spin, watch the pointer betray someone.', image: '/assets/game_wheel.png' },
@@ -68,12 +80,7 @@ const games = [
         <div v-else-if="currentScreen === 'games'" class="absolute inset-0 bg-[#111111] flex flex-col">
           <!-- Top Section -->
           <div class="px-[24px]">
-            <div @click="currentScreen = 'splash'" class="mt-[88px] flex items-center gap-[8px] text-[#CFCFCF] font-poppins text-[13px] cursor-pointer inline-flex transition-opacity hover:opacity-80">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              Back
-            </div>
+            <BackButton @click="currentScreen = 'splash'" />
             
             <h2 class="font-poppins text-[20px] font-semibold text-white tracking-[-0.5px] mt-[24px]">Choose your chaos</h2>
             <p class="font-poppins text-[14px] font-[300] tracking-[-0.5px] text-[#BDBDBD] mt-[8px]">Both are equally unfair. That's the point.</p>
@@ -114,7 +121,8 @@ const games = [
         </div>
 
         <!-- FINGER SCREEN -->
-        <FingerScreen v-else-if="currentScreen === 'finger'" @back="currentScreen = 'games'" />
+        <FingerScreen v-else-if="currentScreen === 'finger'" @back="currentScreen = 'games'" @win="handleWin" />
+    <ResultScreen v-else-if="currentScreen === 'result'" :winner="winner" @restart="resetToFinger" />
 
       </transition>
     </div>
