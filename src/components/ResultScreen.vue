@@ -5,9 +5,10 @@ import StatusBar from './StatusBar.vue'
 const props = defineProps({
   winner: { type: Number, required: true },
 })
-const emit = defineEmits(['restart'])
+const emit = defineEmits(['restart', 'rate'])
 
 function onRestart() { emit('restart') }
+function onRate()    { emit('rate') }
 
 // --- Confetti burst setup ---
 const CONFETTI_COLORS = ['#FF5257', '#007AFF', '#FDC700', '#5FB848', '#5B16E0', '#FF8A00', '#FF4FB0']
@@ -90,11 +91,20 @@ onMounted(() => {
         <p class="font-poppins text-[14px] leading-[20px] text-[#BDBDBD]">Your card is sweating already.</p>
       </div>
       <div class="mt-[40px] flex flex-col gap-[16px]">
-        <button class="w-[327px] h-[50px] bg-[#6028E9] text-white font-poppins font-semibold text-[17px] rounded-[16px] shadow-[0px_4px_0px_0px_#3D0E95] transition-all flex items-center justify-center">
-          Rate the meal ⭐
+        <button
+          @click="onRate"
+          class="w-[327px] h-[50px] bg-[#6028E9] text-white font-poppins font-medium text-[15px] leading-[18px] rounded-[16px] shadow-[0px_4px_0px_0px_#3D0E95] transition-all active:scale-95 flex items-center justify-center gap-[6px]"
+          style="letter-spacing: -0.5px;"
+        >
+          <span class="font-poppins font-medium text-[15px] leading-[18px]" style="letter-spacing: -0.5px;">Rate the meal</span>
+          <img src="/assets/star_blush.png" alt="star" class="w-[20px] h-[20px] object-contain pointer-events-none select-none inline-block" />
         </button>
-        <button @click="onRestart" class="w-[327px] h-[50px] border border-[#333333] text-[#BDBDBD] font-poppins font-medium text-[14px] rounded-[16px] flex items-center justify-center">
-          Run it back
+        <button
+          @click="onRestart"
+          class="w-[327px] h-[50px] border border-[#333333] text-[#BDBDBD] font-poppins font-medium text-[15px] leading-[18px] rounded-[16px] flex items-center justify-center active:scale-95 transition-all"
+          style="letter-spacing: -0.5px;"
+        >
+          <span class="font-poppins font-medium text-[15px] leading-[18px]" style="letter-spacing: -0.5px;">Run it back</span>
         </button>
       </div>
     </div>

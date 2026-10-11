@@ -4,18 +4,36 @@ import StatusBar from './components/StatusBar.vue'
 import FingerScreen from './components/FingerScreen.vue'
 import BackButton from './components/BackButton.vue'
 import ResultScreen from './components/ResultScreen.vue'
+import RateScreen from './components/RateScreen.vue'
+import RewardScreen from './components/RewardScreen.vue'
+import WheelScreen from './components/WheelScreen.vue'
+import TicTacToeScreen from './components/TicTacToeScreen.vue'
 
 const currentScreen = ref('splash')
 const winner = ref(null)
+const isRating = ref(false)
 
 function handleWin(p) {
   winner.value = p
+  isRating.value = false
   currentScreen.value = 'result'
 }
 
 function resetToFinger() {
   currentScreen.value = 'finger'
   winner.value = null
+  isRating.value = false
+}
+
+function resetToWheel() {
+  currentScreen.value = 'wheel'
+  winner.value = null
+  isRating.value = false
+}
+
+function handleFeedbackSubmitted() {
+  isRating.value = false
+  currentScreen.value = 'reward'
 }
 const games = [
   { title: 'Pick a Finger', badge: 'Multi player', description: 'Everyone holds a finger on the screen. One gets chosen.', image: '/assets/game_finger.png' },
@@ -66,8 +84,12 @@ const games = [
 
           <!-- Bottom Content -->
           <div class="absolute bottom-0 left-0 right-0 pb-[12px] z-20 flex flex-col items-center gap-[16px]">
-            <button @click="currentScreen = 'games'" class="w-[327px] h-[50px] bg-[#6028E9] hover:bg-[#5020c9] text-white font-poppins font-semibold text-[17px] rounded-[16px] shadow-[0px_4px_0px_0px_#3D0E95] transition-all active:scale-95 flex items-center justify-center gap-2">
-              Let's find out 🎲
+            <button
+              @click="currentScreen = 'games'"
+              class="w-[327px] h-[50px] bg-[#6028E9] hover:bg-[#5020c9] text-white font-poppins font-medium text-[15px] leading-[18px] rounded-[16px] shadow-[0px_4px_0px_0px_#3D0E95] transition-all active:scale-95 flex items-center justify-center gap-2"
+              style="letter-spacing: -0.5px;"
+            >
+              <span class="font-poppins font-medium text-[15px] leading-[18px]" style="letter-spacing: -0.5px;">Let's find out 🎲</span>
             </button>
             
             <p class="text-[#88888A] text-[9px] leading-none text-center" style="font-family: 'Chalkduster', 'Comic Sans MS', cursive;">
@@ -91,7 +113,7 @@ const games = [
           <div
             v-for="(game, index) in games"
             :key="index"
-            @click="index === 0 ? currentScreen = 'finger' : null"
+            @click="index === 0 ? currentScreen = 'finger' : (index === 1 ? currentScreen = 'wheel' : currentScreen = 'tictactoe')"
             class="w-[327px] min-h-[99px] rounded-[24px] bg-[#232323] border border-[#333333] overflow-hidden relative cursor-pointer transition-transform active:scale-[0.98]"
           >
               
@@ -122,7 +144,23 @@ const games = [
 
         <!-- FINGER SCREEN -->
         <FingerScreen v-else-if="currentScreen === 'finger'" @back="currentScreen = 'games'" @win="handleWin" />
-    <ResultScreen v-else-if="currentScreen === 'result'" :winner="winner" @restart="resetToFinger" />
+        
+        <!-- WHEEL SCREEN -->
+        <WheelScreen v-else-if="currentScreen === 'wheel'" @back="currentScreen = 'games'" @win="handleWin" />
+
+        <!-- TIC-TAC-TOE SCREEN -->
+        <TicTacToeScreen v-else-if="currentScreen === 'tictactoe'" @back="currentScreen = 'games'" @win="handleWin" />
+
+        <div v-else-if="currentScreen === 'result'" class="absolute inset-0">
+          <ResultScreen :winner="winner" @restart="resetToFinger" @rate="isRating = true" />
+          <RateScreen v-if="isRating" @close="isRating = false" @submitted="handleFeedbackSubmitted" />
+        </div>
+        <RewardScreen
+          v-else-if="currentScreen === 'reward'"
+          :winner="winner || 4"
+          @back="currentScreen = 'result'"
+          @home="currentScreen = 'splash'"
+        />
 
       </transition>
     </div>
